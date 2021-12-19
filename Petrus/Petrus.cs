@@ -165,6 +165,14 @@ namespace Petrus
                         if (content != null)
                         {
 
+                            if (options.ForceJson)
+                            {
+                                return new PetrusResult
+                                {
+                                    Data = JObject.Parse(data)
+                                };
+                            }
+
                             switch (content.Headers.ContentType.MediaType)
                             {
                                 case MediaTypeNames.Text.Html:

@@ -4,10 +4,11 @@
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>0.2</Version>
+    <Version>0.2.3</Version>
     <Authors>Pedro Braga</Authors>
     <Description>HTTPClient Wrapper like Axios from Js</Description>
-    <PackageId>Petrus_Pedro_Braga</PackageId>
+    <PackageId>Petrus</PackageId>
+    <PackageProjectUrl>https://github.com/pedrohenriquebr/petrus</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

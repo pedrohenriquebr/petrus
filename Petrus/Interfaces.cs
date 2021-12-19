@@ -18,6 +18,8 @@ namespace Petrus
                 public Dictionary<string, string> Body { get; set; }
 
                 public Headers Headers { get; set; }
+
+                public bool ForceJson { get; set; } = false;
             }
 
             public class PostOptions

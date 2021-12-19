@@ -1,11 +1,44 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using Petrus.Interfaces.Models;
 using Petrus.Interfaces.Props;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Petrus.Tests
 {
+    public static class Helpers
+    {
+        public static Int64 GetTime()
+        {
+            var time = (DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1));
+            return (Int64)(time.TotalMilliseconds + 0.5);
+        }
+
+        public static string ParseXML(string xml)
+        {
+            if (!string.IsNullOrEmpty(xml))
+            {
+                var doc = XElement.Parse(xml);
+                var node_cdata = doc.DescendantNodes().OfType<XCData>().ToList();
+
+                foreach (var node in node_cdata)
+                {
+                    node.Parent.Add(node.Value);
+                    node.Remove();
+                }
+
+                return JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.None, false);
+            }
+
+            return string.Empty;
+        }
+
+
+    }
 
 
     [TestClass()]
@@ -57,9 +90,21 @@ namespace Petrus.Tests
         {
             var response = await Petrus.Post("https://classify-web.herokuapp.com/api/encrypt", new
             {
-                data  = "ooo",
+                data = "ooo",
                 key = "baaa"
             });
+
+            Assert.IsNotNull(response.Data);
+        }
+
+        [TestMethod()]
+        public async Task GetInitialData()
+        {
+            var response = await Petrus.Get(
+                string
+                .Format("http://{0}/moneyBook/getInitData?_dc={1}",
+                    "10.0.0.111:8888", Helpers.GetTime()),
+                new PetrusOptions { ForceJson = true });
 
             Assert.IsNotNull(response.Data);
         }
