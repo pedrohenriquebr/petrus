@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31829.152
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Petrus", "Petrus\Petrus.csproj", "{1EC44665-2C8E-4064-910D-DD8F6BEA3D29}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetrusTests", "PetrusTests\PetrusTests.csproj", "{046D21B2-1EB0-402F-B8F0-BD4407D7C5CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1EC44665-2C8E-4064-910D-DD8F6BEA3D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EC44665-2C8E-4064-910D-DD8F6BEA3D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EC44665-2C8E-4064-910D-DD8F6BEA3D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EC44665-2C8E-4064-910D-DD8F6BEA3D29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046D21B2-1EB0-402F-B8F0-BD4407D7C5CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046D21B2-1EB0-402F-B8F0-BD4407D7C5CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046D21B2-1EB0-402F-B8F0-BD4407D7C5CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046D21B2-1EB0-402F-B8F0-BD4407D7C5CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {419C3248-968C-4B21-9C34-D29366E0FED7}
+	EndGlobalSection
+EndGlobal
