@@ -1,14 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using Petrus.Interfaces.Models;
-using Petrus.Interfaces.Props;
+using PetrusPackage.Interfaces.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Petrus.Tests
+namespace PetrusPackage.Tests
 {
     public static class Helpers
     {
@@ -48,20 +47,21 @@ namespace Petrus.Tests
         [TestMethod()]
         public async Task GetTestPokemon()
         {
-            PetrusResult result = await Petrus.Get("https://pokeapi.co/api/v2/pokemon/pikachu");
+            PResult result = await Petrus.Get("https://pokeapi.co/api/v2/pokemon/pikachu");
             Assert.IsNotNull(result.Data.abilities, "abilities cannot be null");
         }
 
         [TestMethod()]
         public async Task GetTest1()
         {
-            var result = await Petrus.Get("https://google.com/search", new PetrusOptions
+            var result = await Petrus.Get("https://google.com/search", new()
             {
-                Params = new List<(string, string)>()
+                Params = new List<(string, string)>
                 {
                     ("q","opa")
                 }
             });
+
 
             Assert.IsNotNull(result.Data);
         }
@@ -88,11 +88,13 @@ namespace Petrus.Tests
         [TestMethod()]
         public async Task PostTest()
         {
-            var response = await Petrus.Post("https://classify-web.herokuapp.com/api/encrypt", new
-            {
-                data = "ooo",
-                key = "baaa"
-            });
+            var response = await Petrus.Post(
+                "https://classify-web.herokuapp.com/api/encrypt",
+                new
+                {
+                    data = "ooo",
+                    key = "baaa"
+                });
 
             Assert.IsNotNull(response.Data);
         }
@@ -104,7 +106,7 @@ namespace Petrus.Tests
                 string
                 .Format("http://{0}/moneyBook/getInitData?_dc={1}",
                     "10.0.0.111:8888", Helpers.GetTime()),
-                new PetrusOptions { ForceJson = true });
+                new() { ForceJson = true });
 
             Assert.IsNotNull(response.Data);
         }
