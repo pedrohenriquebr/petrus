@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json.Linq;
-using Petrus.Interfaces.Models;
-using Petrus.Interfaces.Props;
+using PetrusPackage.Interfaces.Models;
+using PetrusPackage.Interfaces.Props;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -9,50 +9,56 @@ using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
+using PetrusPackage.Extensions;
 
-namespace Petrus
+namespace PetrusPackage
 {
+
     public class Petrus
     {
-
-        public static async Task<PetrusResult> Get(string url)
+        private Petrus()
         {
-            return await Get(url, new PetrusOptions
+
+        }
+        public static PInstance Create(PInstanceOptions options) => new(options);
+        public static PInstance Create() => new(new PInstanceOptions() { });
+        public static async Task<PResult> Get(string url)
+        {
+            return await Get(url, new POptions
             {
                 Params = null,
                 Headers = null
             });
         }
-        public static async Task<PetrusResult> Post(string url)
+        public static async Task<PResult> Post(string url)
         {
-            return await Post(url, new PetrusOptions { });
+            return await Post(url, new POptions { });
         }
-        public static async Task<PetrusResult> Post(string url, object body)
+        public static async Task<PResult> Post(string url, object body)
         {
 
             var dict = new Dictionary<string, string>();
 
-            foreach(var prop in body.GetType().GetProperties())
+            foreach (var prop in body.GetType().GetProperties())
             {
                 dict.Add(prop.Name, prop.GetValue(body, null).ToString());
             }
 
-            return await Post(url, new PetrusOptions
+            return await Post(url, new POptions
             {
                 Body = dict
             });
         }
-        public static async Task<PetrusResult> Post(string url, Dictionary<string, string> body)
+        public static async Task<PResult> Post(string url, Dictionary<string, string> body)
         {
-            return await Post(url, new PetrusOptions
+            return await Post(url, new POptions
             {
                 Body = body
             });
         }
-        public static async Task<PetrusResult> Post(string url, PetrusOptions options)
+        public static async Task<PResult> Post(string url, POptions options)
         {
-            using (HttpClient client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 var fullUrl = url;
                 HttpContent httpContent = null;
@@ -85,36 +91,30 @@ namespace Petrus
                     httpContent = new FormUrlEncodedContent(options.Body);
                 }
 
-                using (HttpResponseMessage response = await client.PostAsync(fullUrl, httpContent))
+                using (var response = await client.PostAsync(fullUrl, httpContent))
                 {
-                    using (HttpContent content = response.Content)
+                    using (var content = response.Content)
                     {
                         var data = await content.ReadAsStringAsync();
+                        var result = new PResult();
 
+                        result.Response = response;
                         if (content != null)
                         {
 
                             switch (content.Headers.ContentType.MediaType)
                             {
                                 case MediaTypeNames.Text.Html:
-                                    return new PetrusResult
-                                    {
-                                        Data = data
-                                    };
-
+                                    result.Data = data;
+                                    return result;
                                 case MediaTypeNames.Application.Json:
-                                    return new PetrusResult
-                                    {
-                                        Data = JObject.Parse(data)
-                                    };
+                                    result.Data = JObject.Parse(data);
+                                    return result;
                                 case MediaTypeNames.Application.Xml:
                                     var doc = new XmlDocument();
                                     doc.LoadXml(data);
-                                    return new PetrusResult
-                                    {
-                                        Data = doc
-                                    };
-
+                                    result.Data = doc;
+                                    return result;
                             }
 
                             throw new Exception(string.Format("Unknow MimeType {0}", content.Headers.ContentType.MediaType));
@@ -127,9 +127,9 @@ namespace Petrus
                 }
             }
         }
-        public static async Task<PetrusResult> Get(string url, PetrusOptions options)
+        public static async Task<PResult> Get(string url, POptions options)
         {
-            using (HttpClient client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 var fullUrl = url;
 
@@ -156,44 +156,36 @@ namespace Petrus
                     fullUrl = QueryHelpers.AddQueryString(fullUrl, dict);
                 }
 
-                using (HttpResponseMessage response = await client.GetAsync(fullUrl))
+                using (var response = await client.GetAsync(fullUrl))
                 {
-                    using (HttpContent content = response.Content)
+                    using (var content = response.Content)
                     {
                         var data = await content.ReadAsStringAsync();
+                        var result = new PResult();
 
+                        result.Response = response;
                         if (content != null)
                         {
 
                             if (options.ForceJson)
                             {
-                                return new PetrusResult
-                                {
-                                    Data = JObject.Parse(data)
-                                };
+                                result.Data = JObject.Parse(data);
+                                result.Response = response;
                             }
 
                             switch (content.Headers.ContentType.MediaType)
                             {
                                 case MediaTypeNames.Text.Html:
-                                    return new PetrusResult
-                                    {
-                                        Data = data
-                                    };
-
+                                    result.Data = data;
+                                    return result;
                                 case MediaTypeNames.Application.Json:
-                                    return new PetrusResult
-                                    {
-                                        Data = JObject.Parse(data)
-                                    };
+                                    result.Data = JObject.Parse(data);
+                                    return result;
                                 case MediaTypeNames.Application.Xml:
                                     var doc = new XmlDocument();
                                     doc.LoadXml(data);
-                                    return new PetrusResult
-                                    {
-                                        Data = doc
-                                    };
-
+                                    result.Data = doc;
+                                    return result;
                             }
 
                             throw new Exception(string.Format("Unknow MimeType {0}", content.Headers.ContentType.MediaType));
@@ -205,6 +197,50 @@ namespace Petrus
                     }
                 }
             }
+        }
+    }
+
+    public class PInstance
+    {
+
+        private PInstanceOptions _options;
+
+        private PInstance()
+        {
+
+        }
+
+        public PInstance(PInstanceOptions options)
+        {
+            _options = options;
+        }
+
+        public Task<PResult> Get(string url)
+        {
+            return Petrus.Get(_options.BaseURL.AppendToURL(url), new POptions
+            {
+                ForceJson = _options.ForceJson,
+                Headers = _options.Headers,
+            });
+        }
+
+        public Task<PResult> Post(string url)
+        {
+            return Petrus.Post(_options.BaseURL.AppendToURL(url), new POptions
+            {
+                ForceJson = _options.ForceJson,
+                Headers = _options.Headers,
+            });
+        }
+
+        public Task<PResult> Get()
+        {
+            return Get("");
+        }
+
+        public Task<PResult> Post()
+        {
+            return Post("");
         }
     }
 }
