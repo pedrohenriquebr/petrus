@@ -1,8 +1,9 @@
-﻿using Petrus.Interfaces.Models;
+﻿using PetrusPackage.Interfaces.Models;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
-namespace Petrus
+namespace PetrusPackage
 {
 
     namespace Interfaces
@@ -11,7 +12,7 @@ namespace Petrus
 
         namespace Props
         {
-            public class PetrusOptions
+            public class POptions
             {
                 public IEnumerable<ValueTuple<string?, string?>>? Params { get; set; }
 
@@ -26,6 +27,14 @@ namespace Petrus
             {
 
             }
+
+
+            public class PInstanceOptions
+            {
+                public Headers Headers { get; set; }
+                public bool ForceJson { get; set; } = false;
+                public string BaseURL { get; set; }
+            }
         }
 
 
@@ -37,14 +46,13 @@ namespace Petrus
                 public string? Accept { get; set; }
             }
 
-            public class PetrusResult
+            public class PResult
             {
                 public dynamic Data { get; set; }
+                public HttpResponseMessage Response { get; set; }
             }
 
         }
-
-
 
     }
 }
