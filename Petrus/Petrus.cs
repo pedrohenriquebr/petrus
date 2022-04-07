@@ -20,6 +20,21 @@ namespace PetrusPackage
         {
 
         }
+
+        /// <summary>
+        /// Parse a JSON into object or objects array
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static JContainer ParseJSONData(string data)
+        {
+            if(data.StartsWith("[") && data.EndsWith("]"))
+            {
+                return JArray.Parse(data);
+            }
+
+            return JObject.Parse(data);
+        }
         public static PInstance Create(PInstanceOptions options) => new(options);
         public static PInstance Create() => new(new PInstanceOptions() { });
         public static async Task<PResult> Get(string url)
@@ -169,7 +184,7 @@ namespace PetrusPackage
 
                             if (options.ForceJson)
                             {
-                                result.Data = JObject.Parse(data);
+                                result.Data = ParseJSONData(data);
                                 result.Response = response;
                             }
 
@@ -179,7 +194,7 @@ namespace PetrusPackage
                                     result.Data = data;
                                     return result;
                                 case MediaTypeNames.Application.Json:
-                                    result.Data = JObject.Parse(data);
+                                    result.Data = ParseJSONData(data);
                                     return result;
                                 case MediaTypeNames.Application.Xml:
                                     var doc = new XmlDocument();
