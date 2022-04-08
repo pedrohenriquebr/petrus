@@ -99,16 +99,14 @@ namespace PetrusPackage.Tests
             Assert.IsNotNull(response.Data);
         }
 
+
         [TestMethod()]
-        public async Task GetInitialData()
+        public async Task GetAllEstados()
         {
-            var response = await Petrus.Get(
-                string
-                .Format("http://{0}/moneyBook/getInitData?_dc={1}",
-                    "10.0.0.111:8888", Helpers.GetTime()),
-                new() { ForceJson = true });
+            var response = await Petrus.Get("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
 
             Assert.IsNotNull(response.Data);
+            Assert.IsTrue(response.Data.Count > 0);
         }
 
     }
