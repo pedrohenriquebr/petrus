@@ -46,9 +46,9 @@ namespace PetrusPackage
                 public string? Accept { get; set; }
             }
 
-            public class PResult
+            public class PResult<T>
             {
-                public dynamic Data { get; set; }
+                public T Data { get; set; }
                 public HttpResponseMessage Response { get; set; }
             }
 

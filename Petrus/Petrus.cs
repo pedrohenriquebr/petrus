@@ -37,19 +37,42 @@ namespace PetrusPackage
         }
         public static PInstance Create(PInstanceOptions options) => new(options);
         public static PInstance Create() => new(new PInstanceOptions() { });
-        public static async Task<PResult> Get(string url)
+
+        public static async Task<PResult<dynamic>> Get(string url)
         {
-            return await Get(url, new POptions
+            return await Get<dynamic>(url, new POptions
             {
                 Params = null,
                 Headers = null
             });
         }
-        public static async Task<PResult> Post(string url)
+        public static async Task<PResult<dynamic>> Get(string url, POptions options)
         {
-            return await Post(url, new POptions { });
+            return await Get<dynamic>(url, options);
         }
-        public static async Task<PResult> Post(string url, object body)
+
+        public static async Task<PResult<dynamic>> Post(string url)
+        {
+            return await Post<dynamic>(url, new POptions { });
+        }
+        public static async Task<PResult<dynamic>> Post(string url, object body)
+        {
+            return await Post<dynamic>(url, body);
+        }
+
+        public static async Task<PResult<T>> Get<T>(string url)
+        {
+            return await Get<T>(url, new POptions
+            {
+                Params = null,
+                Headers = null
+            });
+        }
+        public static async Task<PResult<T>> Post<T>(string url)
+        {
+            return await Post<T>(url, new POptions { });
+        }
+        public static async Task<PResult<T>> Post<T>(string url, object body)
         {
 
             var dict = new Dictionary<string, string>();
@@ -59,19 +82,19 @@ namespace PetrusPackage
                 dict.Add(prop.Name, prop.GetValue(body, null).ToString());
             }
 
-            return await Post(url, new POptions
+            return await Post<T>(url, new POptions
             {
                 Body = dict
             });
         }
-        public static async Task<PResult> Post(string url, Dictionary<string, string> body)
+        public static async Task<PResult<T>> Post<T>(string url, Dictionary<string, string> body)
         {
-            return await Post(url, new POptions
+            return await Post<T>(url, new POptions
             {
                 Body = body
             });
         }
-        public static async Task<PResult> Post(string url, POptions options)
+        public static async Task<PResult<T>> Post<T>(string url, POptions options)
         {
             using (var client = new HttpClient())
             {
@@ -111,7 +134,7 @@ namespace PetrusPackage
                     using (var content = response.Content)
                     {
                         var data = await content.ReadAsStringAsync();
-                        var result = new PResult();
+                        var result = new PResult<T>();
 
                         result.Response = response;
                         if (content != null)
@@ -119,16 +142,13 @@ namespace PetrusPackage
 
                             switch (content.Headers.ContentType.MediaType)
                             {
-                                case MediaTypeNames.Text.Html:
-                                    result.Data = data;
-                                    return result;
                                 case MediaTypeNames.Application.Json:
-                                    result.Data = JObject.Parse(data);
+                                    result.Data = ParseJSONData(data).ToObject<T>();
                                     return result;
                                 case MediaTypeNames.Application.Xml:
                                     var doc = new XmlDocument();
                                     doc.LoadXml(data);
-                                    result.Data = doc;
+                                    result.Data = ParseJSONData(data).ToObject<T>();
                                     return result;
                             }
 
@@ -142,7 +162,7 @@ namespace PetrusPackage
                 }
             }
         }
-        public static async Task<PResult> Get(string url, POptions options)
+        public static async Task<PResult<T>> Get<T>(string url, POptions options)
         {
             using (var client = new HttpClient())
             {
@@ -176,7 +196,7 @@ namespace PetrusPackage
                     using (var content = response.Content)
                     {
                         var data = await content.ReadAsStringAsync();
-                        var result = new PResult();
+                        var result = new PResult<T>();
 
                         result.Response = response;
                         if (content != null)
@@ -184,22 +204,19 @@ namespace PetrusPackage
 
                             if (options.ForceJson)
                             {
-                                result.Data = ParseJSONData(data);
+                                result.Data = ParseJSONData(data).ToObject<T>();
                                 result.Response = response;
                             }
 
                             switch (content.Headers.ContentType.MediaType)
                             {
-                                case MediaTypeNames.Text.Html:
-                                    result.Data = data;
-                                    return result;
                                 case MediaTypeNames.Application.Json:
-                                    result.Data = ParseJSONData(data);
+                                    result.Data = ParseJSONData(data).ToObject<T>();
                                     return result;
                                 case MediaTypeNames.Application.Xml:
                                     var doc = new XmlDocument();
                                     doc.LoadXml(data);
-                                    result.Data = doc;
+                                    result.Data = JObject.Parse(data).ToObject<T>();
                                     return result;
                             }
 
@@ -230,7 +247,7 @@ namespace PetrusPackage
             _options = options;
         }
 
-        public Task<PResult> Get(string url)
+        public Task<PResult<dynamic>> Get(string url)
         {
             return Petrus.Get(_options.BaseURL.AppendToURL(url), new POptions
             {
@@ -239,7 +256,7 @@ namespace PetrusPackage
             });
         }
 
-        public Task<PResult> Post(string url)
+        public Task<PResult<dynamic>> Post(string url)
         {
             return Petrus.Post(_options.BaseURL.AppendToURL(url), new POptions
             {
@@ -248,12 +265,12 @@ namespace PetrusPackage
             });
         }
 
-        public Task<PResult> Get()
+        public Task<PResult<dynamic>> Get()
         {
             return Get("");
         }
 
-        public Task<PResult> Post()
+        public Task<PResult<dynamic>> Post()
         {
             return Post("");
         }
