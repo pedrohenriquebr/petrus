@@ -47,7 +47,7 @@ namespace PetrusPackage.Tests
         [TestMethod()]
         public async Task GetTestPokemon()
         {
-            PResult result = await Petrus.Get("https://pokeapi.co/api/v2/pokemon/pikachu");
+            PResult<dynamic> result = await Petrus.Get("https://pokeapi.co/api/v2/pokemon/pikachu");
             Assert.IsNotNull(result.Data.abilities, "abilities cannot be null");
         }
 
