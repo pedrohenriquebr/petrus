@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using PetrusPackage.Interfaces.Models;
+using PetrusTests.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,32 +53,6 @@ namespace PetrusPackage.Tests
         }
 
         [TestMethod()]
-        public async Task GetTest1()
-        {
-            var result = await Petrus.Get("https://google.com/search", new()
-            {
-                Params = new List<(string, string)>
-                {
-                    ("q","opa")
-                }
-            });
-
-
-            Assert.IsNotNull(result.Data);
-        }
-
-        [TestMethod()]
-        public async Task PostDynamicObject()
-        {
-            var response = await Petrus.Post("https://google.com", new
-            {
-                q = "pedro"
-            });
-
-            Assert.IsNotNull(response.Data);
-        }
-
-        [TestMethod()]
         public async Task GetTestApi()
         {
             var response = await Petrus.Get("https://api.publicapis.org/entries");
@@ -101,12 +76,15 @@ namespace PetrusPackage.Tests
 
 
         [TestMethod()]
-        public async Task GetAllEstados()
+        public async Task GetAllStates_UsingGenericType()
         {
-            var response = await Petrus.Get("https://servicodados.ibge.gov.br/api/v1/localidades/estados");
+            var apiUrl = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
+            var response = await Petrus.Get<State[]>(apiUrl);
 
             Assert.IsNotNull(response.Data);
-            Assert.IsTrue(response.Data.Count > 0);
+            Assert.IsTrue(response.Data.Length > 0);
+
+            Assert.AreEqual<string>(response.Data[0].Name, "Rondônia");
         }
 
     }
